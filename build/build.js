@@ -1,19 +1,20 @@
 var fs = require('fs'),
-    mainConfig = require('../js/main.js'),  
-    target = './configs/dXBuild.min.js',
-    viewFolder = './js/views',
+    root = __dirname+'/../../../',
+    mainConfig = require('../../../js/main.js'),
+    target = 'configs/dXBuild.min.js',
+    viewFolder = 'js/views',
     views,
-    templateFolder = './templates',
+    templateFolder = 'templates',
     templates,
     includes = [],
     result;
 
-views = fs.readdirSync(viewFolder);
+views = fs.readdirSync(root+viewFolder);
 includes = includes.concat(views.map(function(v) {
     return 'views/'+v.replace('.js', '');
 }));
 
-templates = fs.readdirSync(templateFolder);
+templates = fs.readdirSync(root+templateFolder);
 includes = includes.concat(templates.map(function(v) {
     return 'text!templates/'+v.replace('.js', '');
 }));
@@ -37,4 +38,4 @@ result = {
     enforceDefine: true
 };
 
-fs.writeFileSync(target, '('+JSON.stringify(result)+')');
+fs.writeFileSync(root+target, '('+JSON.stringify(result)+')');
