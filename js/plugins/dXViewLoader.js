@@ -11,19 +11,17 @@ define([
     'configs/dXViews.conf',
     'dX/libs/debug',
     'dX/libs/is',
-    'dX/libs/unique',
     'dX/Shim!Object.keys'
 ], function(
     _,
     routesConf,
     dexterConf,
     debug,
-    is,
-    unique
+    is
 ) {
 
     // Welcome message
-    debug('~>')('Welcome to Dexter 0.4.0');
+    debug('~>')('Welcome to Dexter 0.5.0');
 
     var log = debug('DX'),
         paths = [];
@@ -57,7 +55,7 @@ define([
      */
 
     function specialUnique(arr) {
-        var u = {}, o = {}, a = [], i, l, str, key;
+        var u = {}, o = {}, i, l, str, key;
 
         for(i = 0, l = arr.length; i < l; ++i) {
             str = arr[i].split('/');
