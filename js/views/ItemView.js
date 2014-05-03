@@ -44,7 +44,7 @@ define([
             templateName = this.dXConfig.templateName || this.dXName;
             template = this.dXTemplateRenderer(require('text!templates/'+templateName+'.html'),
                 typeof this.dXTemplateData === 'function'?
-                    this.dXTemplateData() : this.dXTemplateData);
+                    this.dXTemplateData(this) : this.dXTemplateData);
 
             // Todo Strange jQuery bug, investigate
             while (template[0] === '\r' ||
