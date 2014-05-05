@@ -1,10 +1,8 @@
 define([
     'dX/libs/debug',
-    'dX/libs/override',
     'eventemitter2'
 ], function(
     debug,
-    override,
     EventEmitter2
 ) {
 
