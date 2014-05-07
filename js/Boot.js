@@ -1,6 +1,6 @@
 /**
- * 
- * 
+ *
+ *
  * @author: Riplexus <riplexus@gmail.com>
  */
 
@@ -13,8 +13,8 @@ define([
     dXRouter,
     routesConf,
     dexterConf
-) {
-    
+    ) {
+
     return function() {
         // Redirect #! to /
         if (window.location.hash.indexOf('!') > -1) {
@@ -39,9 +39,7 @@ define([
             });
         });
 
-        // Start router.
-        this.dXRouter = dXRouter;
-        this.dXRouter.init();
+        dXRouter.start();
     };
 
 });

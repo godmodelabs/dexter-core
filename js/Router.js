@@ -37,19 +37,9 @@ define([
 
     debug = debug('DX');
 
-    var AppRouter = Backbone.Router.extend({
-        routes: routesConf
-    });
+    return new (Backbone.Router.extend(/** @lends Router.prototype */{
 
-    // Todo extend Backbone.Router directly?
-
-    return /** @lends Router.prototype */{
-
-        /**
-         * Stores the Backbone.Router object.
-         */
-
-        obj: null,
+        routes: routesConf,
 
         /**
          * Stores the current, route-linked view.
@@ -85,7 +75,7 @@ define([
          * The current routing parameters.
          */
 
-        parameters: null,
+        parameters: [],
 
         /**
          * The main behaviour of the router is described here.
@@ -93,11 +83,9 @@ define([
          * afterwards and manage the behaviour on route change.
          */
 
-        init: function() {
+        start: function() {
             var i, view, viewName,
                 that = this;
-
-            this.obj = new AppRouter();
 
             /*
              * Load global, navigation independent views.
@@ -137,7 +125,7 @@ define([
                      * Manage route changes.
                      */
 
-                    this.obj.on('route:'+viewName, function() {
+                    this.on('route:'+viewName, function() {
                         var path, $body,
                             that = this;
 
@@ -146,7 +134,9 @@ define([
                          * views.
                          */
 
-                        this.parameters = Array.prototype.slice.call(arguments);
+                        if (arguments[0] !== null) {
+                            this.parameters = Array.prototype.slice.call(arguments);
+                        }
                         this.path = Backbone.history.fragment;
 
                         debug.lightblue('navigate to /'+this.path);
@@ -239,10 +229,10 @@ define([
 
                     event.preventDefault();
                     url = href.replace(/^\//,'').replace(/#!/, '');
-                    this.obj.navigate(url, { trigger: true });
+                    this.navigate(url, { trigger: true });
                 }
             }.bind(this));
-            
+
             /*
              * Router events.
              */
@@ -257,8 +247,8 @@ define([
          */
 
         goTo: function(path) {
-            this.obj.navigate(path, {trigger: true});
+            this.navigate(path, {trigger: true});
         }
-    };
+    }))();
 
 });
