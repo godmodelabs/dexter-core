@@ -31,7 +31,7 @@ define([
          * Mark this views as static.
          */
         
-        dXStatic: true
+        dXType: 'static'
     });
 
     return dXStaticView;

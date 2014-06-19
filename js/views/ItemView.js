@@ -5,14 +5,16 @@ define([
     'dX/libs/debug',
     'dX/libs/uuid',
     'dX/libs/applyMaybe',
-    'dX/View'
+    'dX/View',
+    'configs/dXViews.min'
 ], function(
     _, $,
     Backbone,
     debug,
     uuid,
     applyMaybe,
-    dXView
+    dXView,
+    dXViews
 ) {
 
     debug = debug('DX');
@@ -30,6 +32,12 @@ define([
     var dXItem = dXView.extend(/** @lends dXItem.prototype */{
 
         /**
+         * Mark this view as item.
+         */
+
+        dXType: 'item',
+
+        /**
          * We have to build the template here, to work properly
          * with epoxy. The template is already loaded and can be
          * required synchronously.
@@ -39,10 +47,21 @@ define([
          */
 
         el: function() {
-            var templateName, template;
+            if (!this.dXName) {
+                debug.error(
+                    'Missing dXName for item view!',
+                    'Attribute dXName is required for every dXView');
+                return;
+            }
 
-            templateName = this.dXConfig.templateName || this.dXName;
-            template = this.dXTemplateRenderer(require('text!templates/'+templateName+'.html'),
+            if (_.indexOf(dXViews, this.dXName) === -1) {
+                debug.error(
+                    'Missing view declaration for item #'+this.dXName+'!',
+                    'Add \''+this.dXName+'\' in /configs/dXViews.min.js');
+                return 'asd';
+            }
+
+            var template = this.dXTemplateRenderer(require('text!templates/'+this.dXName+'.html'),
                 typeof this.dXTemplateData === 'function'?
                     this.dXTemplateData(this) : this.dXTemplateData);
 
