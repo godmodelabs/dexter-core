@@ -44,7 +44,7 @@ define([
 
         // Start router.
         this.dXRouter = dXRouter;
-        this.dXRouter.init();
+        this.dXRouter.start();
     };
 
 });
