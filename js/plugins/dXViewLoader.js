@@ -7,15 +7,13 @@
 
 define([
     'underscore',
-    'configs/dXRoutes.conf',
-    'configs/dXViews.conf',
+    'configs/dXViews.min',
     'dX/libs/debug',
     'dX/libs/is',
     'dX/Shim!Object.keys'
 ], function(
     _,
-    routesConf,
-    dexterConf,
+    dXViews,
     debug,
     is
 ) {
@@ -186,7 +184,7 @@ define([
         load: function(resourceId, require, load, config) {
             if (config.isBuild) { return load(); }
 
-            var viewPaths, ret, i, target;
+            var viewPaths, ret;
 
             viewPaths = [];
             ret = {};
@@ -194,23 +192,16 @@ define([
             // Collect every view path, needed for rendering
             // Resolve system specific declarations.
 
-            _.each([
-                routesConf,
-                dexterConf.preLoad.views,
-                dexterConf.global
-            ], function(list) {
-                _.each(list, function(target) {
+            _.each(dXViews, function(target) {
+                if (_.isArray(target)) {
+                    _.each(target, function(view) {
+                        viewPaths.push('views/'+checkSystem(view));
+                    });
 
-                    if (_.isArray(target)) {
-                        _.each(target, function(view) {
-                            viewPaths.push('views/'+checkSystem(view));
-                        });
+                } else {
+                    viewPaths.push('views/'+checkSystem(target));
+                }
 
-                    } else {
-                        viewPaths.push('views/'+checkSystem(target));
-                    }
-
-                });
             });
 
             viewPaths = specialUnique(viewPaths);
@@ -218,9 +209,7 @@ define([
             // Retrieve the views recursively.
 
             getViewList(require, viewPaths, ret, function(ret) {
-                var missing, found, i, j;
                 log.yellow('registered views:\n     '+paths.join(',\n     '));
-
                 load(ret);
             });
         }
