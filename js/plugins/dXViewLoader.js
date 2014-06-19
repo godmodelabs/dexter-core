@@ -1,6 +1,5 @@
 /**
- * Get every view registered as global, routed, subView or
- * mentioned at dXViews.conf.js for preloading.
+ * Get every view mentioned at dXViews.min.js.
  *
  * @author: Riplexus <riplexus@gmail.com>
  */
@@ -171,8 +170,7 @@ define([
 
     /**
      * Return a require.js plugin which loads every view
-     * (global, routed, subViews and views mentioned under
-     * dexterConf.preLoad.views (item views)) and returns
+     * (static, routed, subViews and item views) and returns
      * the view objects for further instantiation.
      *
      * It manages the real paths for the views by setting the dXPath

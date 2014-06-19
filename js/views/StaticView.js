@@ -26,6 +26,8 @@ define([
      */
 
     var dXStaticView = dXView.extend(/** @lends dXStaticView.prototype */{
+        
+        dXStatic: true,
 
         /**
          *

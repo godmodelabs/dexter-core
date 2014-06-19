@@ -1,5 +1,5 @@
 // Welcome message
-console && console.log('Welcome to Dexter 0.5.0');
+console && console.log('Welcome to Dexter 0.6.0');
 
 /**
  *
@@ -10,12 +10,12 @@ console && console.log('Welcome to Dexter 0.5.0');
 define([
     'dX/Router',
     'configs/dXRoutes.conf',
-    'configs/dXViews.conf',
+    'configs/dXViews.min',
     'shim!console.log'
 ], function(
     dXRouter,
     routesConf,
-    dexterConf
+    dXViews
 ) {
 
     return function() {
@@ -30,7 +30,7 @@ define([
         // specific loading.
         _.each([
             routesConf,
-            dexterConf.global
+            dXViews
         ], function(list) {
             _.each(list, function(route, i) {
                 if (_.isArray(route)) {

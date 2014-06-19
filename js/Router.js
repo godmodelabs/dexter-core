@@ -1,5 +1,5 @@
 /**
- * The router manages the loading of global and routed
+ * The router manages the loading of static and routed
  * views and the behaviour on route change. We use the
  * Backbone.Router to simplify the routing.
  *
@@ -13,7 +13,7 @@ define([
     'backbone',
     'modernizr',
     'configs/dXRoutes.conf',
-    'configs/dXViews.conf',
+    'configs/dXViews.min',
     'dX/ViewLoader!',
     'dX/TemplateLoader!',
     'dX/libs/debug',
@@ -26,7 +26,7 @@ define([
     Backbone,
     Modernizr,
     routesConf,
-    dexterConf,
+    dXViews,
     viewList,
     templateList,
     debug,
@@ -37,11 +37,15 @@ define([
 
     debug = debug('DX');
 
-    var diff = _.difference(_.keys(flip(routesConf)), _.keys(viewList));
-    if (diff.length) {
+    var $body = $('body'),
+        viewRoutes = flip(routesConf),
+        staticViews = _.difference(_.keys(viewList), _.keys(viewRoutes)),
+        errCheck = _.difference(_.keys(viewRoutes), _.keys(viewList));
+
+    if (errCheck.length) {
         debug.error(
-            'Missing view declaration for routed view #'+diff.join(', #')+'!',
-            'Add \''+diff.join()+'\' in /configs/dXViews.min.js');
+            'Missing view declaration for routed #'+errCheck.join(', #')+'!',
+            'Add \''+errCheck.join()+'\' in /configs/dXViews.min.js');
     }
 
     return new (Backbone.Router.extend(/** @lends Router.prototype */{
@@ -70,7 +74,7 @@ define([
          * Maps the view names to routes.
          */
 
-        viewRoutes: flip(routesConf),
+        viewRoutes: viewRoutes,
 
         /**
          * Cached route classes, will be added to the body.
@@ -86,36 +90,51 @@ define([
 
         /**
          * The main behaviour of the router is described here.
-         * Load the global views first, register the routed views
+         * Load static views first, register the routed views
          * afterwards and manage the behaviour on route change.
          */
 
         start: function() {
-            var i, view, viewName,
+            var i, view, viewName, $view,
                 that = this;
 
             /*
-             * Load global, navigation independent views.
+             * Load static views.
              */
 
-            for (i=dexterConf.global.length; i--;) {
-                viewName = dexterConf.global[i];
+            for (i=staticViews.length; i--;) {
+                viewName = staticViews[i];
 
-                if (viewName in this.viewList) {
-                    // TODO test!
-                    view = [];
-                    $('body').find('[data-dX='+viewName+']').each(function(index) {
-                        var $this = $(this);
-                        $this.attr('data-dX', viewName+'-'+index);
-
-                        view = new (that.viewList[viewName].extend({
-                            dXRouter: that,
-                            dXIndex: index
-                        }))();
-                    });
-
-                    this.viewCache[viewName] = view;
+                if (!(viewName in this.viewList)) {
+                    continue;
                 }
+                if (!this.viewList[viewName].prototype.dXStatic) {
+                    debug.error(
+                        'View #'+viewName+' not static and not routed!',
+                        'Either extend dX/StaticView or declare in configs/dXRoutes.conf.js');
+                    continue;
+                }
+
+                view = [];
+                $view = $body.find('[data-dX='+viewName+']');
+
+                if (!$view.length) {
+                    debug.error(
+                        'Missing container for static #'+viewName+'!',
+                        'Create one with data-dX='+viewName+' in your index.html');
+                }
+
+                $view.each(function(index) {
+                    var $this = $(this);
+                    $this.attr('data-dX', viewName+'-'+index);
+
+                    view = new (that.viewList[viewName].extend({
+                        dXRouter: that,
+                        dXIndex: index
+                    }))();
+                });
+
+                this.viewCache[viewName] = view;
             }
 
             /*
@@ -133,8 +152,7 @@ define([
                      */
 
                     this.on('route:'+viewName, function() {
-                        var path, $body, $view,
-                            that = this;
+                        var path, that = this;
 
                         /*
                          * Store the route parameters in <dXRouter.parameters> for the
@@ -164,7 +182,6 @@ define([
                                 path.pop();
                             }
                         }
-                        $body = $('body');
                         removeClasses($body[0], 'route-');
                         $body.addClass(this.routeClasses[viewName].join(' '));
 
