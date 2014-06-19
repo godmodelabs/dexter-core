@@ -20,9 +20,6 @@ define([
     is
 ) {
 
-    // Welcome message
-    debug('~>')('Welcome to Dexter 0.5.0');
-
     var log = debug('DX'),
         paths = [];
 

@@ -1,3 +1,6 @@
+// Welcome message
+console && console.log('Welcome to Dexter 0.5.0');
+
 /**
  *
  *
@@ -13,7 +16,7 @@ define([
     dXRouter,
     routesConf,
     dexterConf
-    ) {
+) {
 
     return function() {
         // Redirect #! to /
@@ -39,7 +42,9 @@ define([
             });
         });
 
-        dXRouter.start();
+        // Start router.
+        this.dXRouter = dXRouter;
+        this.dXRouter.init();
     };
 
 });
