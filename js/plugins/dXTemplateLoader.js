@@ -6,13 +6,11 @@
  */
 
 define([
-    'configs/dXViews.conf',
     'dX/libs/debug',
     'dX/libs/unique',
     'dX/ViewLoader!',
     'dX/Shim!Object.keys'
 ], function(
-    dexterConf,
     debug,
     unique,
     viewList
@@ -39,12 +37,7 @@ define([
                 }
             }
 
-            if (dexterConf.preLoad &&
-                dexterConf.preLoad.templates) {
-                for (i=dexterConf.preLoad.templates.length; i--;) {
-                    templateList.push('text!templates/'+dexterConf.preLoad.templates[i]+'.html');
-                }
-            }
+            templateList.push('text!templates/loading.html');
 
             debug.yellow('register templates:\n     '+templateList.join(',\n     '));
             require(templateList, function() {

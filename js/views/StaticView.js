@@ -26,18 +26,12 @@ define([
      */
 
     var dXStaticView = dXView.extend(/** @lends dXStaticView.prototype */{
-        
-        dXStatic: true,
 
         /**
-         *
-         * @augments dXView
-         * @constructs dXStaticView object
+         * Mark this views as static.
          */
-
-        initialize: function() {
-            dXView.prototype.initialize.call(this);
-        }
+        
+        dXStatic: true
     });
 
     return dXStaticView;

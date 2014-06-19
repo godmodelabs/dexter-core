@@ -243,7 +243,7 @@ define([
 
             /*
              * Prepend loading screen, if configured. The template
-             * is preloaded as configured in dXViews.conf.js.
+             * is preloaded.
              */
 
             if (this.dXConfig.setLoading) {
@@ -396,7 +396,7 @@ define([
 
         /**
          * Prepend the loading screen. The template
-         * is preloaded as configured in dXViews.conf.js.
+         * is already preloaded.
          * To support absolute positioned loading elements,
          * save the current position attribute and replace
          * 'static' with 'relative' until the loading
