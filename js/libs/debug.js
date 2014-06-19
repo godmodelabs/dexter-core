@@ -92,6 +92,17 @@ function debug(name) {
      * color plugin end
      */
 
+    /*
+     * Error messages with hints.
+     */
+
+    obj.error = function(err, hint) {
+        console.error(err);
+        if (hint) {
+            console.info('└ '+hint);
+        }
+    };
+
     return obj;
 }
 

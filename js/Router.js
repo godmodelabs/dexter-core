@@ -126,7 +126,7 @@ define([
                      */
 
                     this.on('route:'+viewName, function() {
-                        var path, $body,
+                        var path, $body, $view,
                             that = this;
 
                         /*
@@ -179,7 +179,16 @@ define([
 
                         if (!(viewName in this.viewCache)) {
                             view = [];
-                            $body.find('[data-dX='+viewName+']').each(function(index) {
+                            $view = $body.find('[data-dX='+viewName+']');
+
+                            if (!$view.length) {
+                                debug.error(
+                                    'Missing container for #'+viewName+'!',
+                                    'Create one with data-dX='+viewName+' in your index.html');
+                                return;
+                            }
+
+                            $view.each(function(index) {
                                 var $this = $(this);
                                 $this.attr('data-dX', viewName+'-'+index);
 
