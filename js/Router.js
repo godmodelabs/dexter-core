@@ -37,6 +37,13 @@ define([
 
     debug = debug('DX');
 
+    var diff = _.difference(_.keys(flip(routesConf)), _.keys(viewList));
+    if (diff.length) {
+        debug.error(
+            'Missing view declaration for routed view #'+diff.join(', #')+'!',
+            'Add \''+diff.join()+'\' in /configs/dXViews.min.js');
+    }
+
     return new (Backbone.Router.extend(/** @lends Router.prototype */{
 
         routes: routesConf,
@@ -62,13 +69,13 @@ define([
         /**
          * Maps the view names to routes.
          */
-        
+
         viewRoutes: flip(routesConf),
 
         /**
          * Cached route classes, will be added to the body.
          */
-        
+
         routeClasses: {},
 
         /**
@@ -145,11 +152,11 @@ define([
                          * Create a list of route classes for the current view, will
                          * be assigned to the body for any route specific css code.
                          */
-                        
+
                         if (!(viewName in this.routeClasses)) {
                             path = this.viewRoutes[viewName][0];
                             this.routeClasses[viewName] = [];
-                            
+
                             path = path.replace(/(\*path|:)/g, '').split('/');
                             while(path.length) {
                                 this.routeClasses[viewName]
@@ -245,7 +252,7 @@ define([
             /*
              * Router events.
              */
-            
+
             pipe.on('dXRouter/goTo', this.goTo.bind(this));
         },
 
