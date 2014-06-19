@@ -1,12 +1,12 @@
 /**
- * Get every view mentioned at dXViews.min.js.
+ * Get every view mentioned in dXViews.conf.js.
  *
  * @author: Riplexus <riplexus@gmail.com>
  */
 
 define([
     'underscore',
-    'configs/dXViews.min',
+    'configs/dXViews.conf',
     'dX/libs/debug',
     'dX/libs/is',
     'dX/Shim!Object.keys'

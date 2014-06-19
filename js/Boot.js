@@ -10,7 +10,7 @@ console && console.log('Welcome to Dexter 0.6.0');
 define([
     'dX/Router',
     'configs/dXRoutes.conf',
-    'configs/dXViews.min',
+    'configs/dXViews.conf',
     'shim!console.log'
 ], function(
     dXRouter,

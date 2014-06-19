@@ -13,7 +13,7 @@ define([
     'backbone',
     'modernizr',
     'configs/dXRoutes.conf',
-    'configs/dXViews.min',
+    'configs/dXViews.conf',
     'dX/ViewLoader!',
     'dX/TemplateLoader!',
     'dX/libs/debug',
@@ -45,7 +45,7 @@ define([
     if (errCheck.length) {
         debug.error(
             'Missing view declaration for routed #'+errCheck.join(', #')+'!',
-            'Add \''+errCheck.join()+'\' in /configs/dXViews.min.js');
+            'Add \''+errCheck.join()+'\' in /configs/dXViews.conf.js');
     }
 
     return new (Backbone.Router.extend(/** @lends Router.prototype */{

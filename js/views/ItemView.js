@@ -6,7 +6,7 @@ define([
     'dX/libs/uuid',
     'dX/libs/applyMaybe',
     'dX/View',
-    'configs/dXViews.min'
+    'configs/dXViews.conf'
 ], function(
     _, $,
     Backbone,
@@ -57,7 +57,7 @@ define([
             if (_.indexOf(dXViews, this.dXName) === -1) {
                 debug.error(
                     'Missing view declaration for item #'+this.dXName+'!',
-                    'Add \''+this.dXName+'\' in /configs/dXViews.min.js');
+                    'Add \''+this.dXName+'\' in /configs/dXViews.conf.js');
                 return 'asd';
             }
 
