@@ -18,6 +18,7 @@ define([
 ) {
 
     var log = debug('DX'),
+        topLevel = true,
         paths = [];
 
     /**
@@ -56,7 +57,7 @@ define([
             key = str[str.length-1];
 
             if(u.hasOwnProperty(key) &&
-               u[key] >= str.length) { continue; }
+                u[key] >= str.length) { continue; }
 
             u[key] = str.length;
             o[key] = arr[i];
@@ -91,9 +92,6 @@ define([
                 view = views[i];
                 subViewList = [];
 
-                // Views without dXName are not working
-                if (!view.prototype.dXName) { continue; }
-
                 // Tell the view his real path
                 view.prototype.dXPath = list[i].replace('views/', '');
 
@@ -104,7 +102,9 @@ define([
                 view.prototype.dXSubViewPaths = {};
 
                 // Tell subview his type
-                view.prototype.dXType = 'subview';
+                if (!topLevel) {
+                    view.prototype.dXType = 'subview';
+                }
 
                 subViews = view.prototype.dXSubViews;
                 if (subViews) {
@@ -140,6 +140,7 @@ define([
             if (viewList.length === 0) {
                 callback(ret);
             } else {
+                topLevel = false;
                 getViewList(require, viewList, ret, callback);
             }
 
@@ -202,12 +203,10 @@ define([
                 } else {
                     viewPaths.push('views/'+checkSystem(target));
                 }
-
             });
 
-            viewPaths = specialUnique(viewPaths);
-
             // Retrieve the views recursively.
+            viewPaths = specialUnique(viewPaths);
 
             getViewList(require, viewPaths, ret, function(ret) {
                 log.yellow('registered views:\n     '+paths.join(',\n     '));

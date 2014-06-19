@@ -108,9 +108,17 @@ define([
                 if (!(viewName in this.viewList)) {
                     continue;
                 }
-                if (this.viewList[viewName].prototype.dXType === 'item') {
+
+                // ignore abstract views
+                if (!this.viewList[viewName].prototype.dXName) {
                     continue;
                 }
+
+                if (this.viewList[viewName].prototype.dXType === 'item' ||
+                    this.viewList[viewName].prototype.dXType === 'subview') {
+                    continue;
+                }
+
                 if (this.viewList[viewName].prototype.dXType !== 'static') {
                     debug.error(
                         'View #'+viewName+' not static and not routed!',
