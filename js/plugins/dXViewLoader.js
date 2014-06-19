@@ -103,6 +103,9 @@ define([
                 // Each view has to know the path of his subViews
                 view.prototype.dXSubViewPaths = {};
 
+                // Tell subview his type
+                view.prototype.dXType = 'subview';
+
                 subViews = view.prototype.dXSubViews;
                 if (subViews) {
                     for (j=subViews.length; j--;) {
