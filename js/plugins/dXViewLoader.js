@@ -20,51 +20,6 @@ define([
     var log = debug('DX');
 
     /**
-     * Returns the values of the provided object.
-     *
-     * @param obj
-     * @returns {Array}
-     * @source http://stackoverflow.com/a/15113739/795605
-     * @ignore
-     */
-
-    Object.values = function (obj) {
-        var vals = [], key;
-        for( key in obj ) {
-            if ( obj.hasOwnProperty(key) ) {
-                vals.push(obj[key]);
-            }
-        }
-        return vals;
-    };
-
-    /**
-     * This uniques an array containing view paths by the view name.
-     * The first, most specific path has priority.
-     *
-     * @param arr
-     * @returns {Array}
-     * @ignore
-     */
-
-    function specialUnique(arr) {
-        var u = {}, o = {}, i, l, str, key;
-
-        for(i = 0, l = arr.length; i < l; ++i) {
-            str = arr[i].split('/');
-            key = str[str.length-1];
-
-            if(u.hasOwnProperty(key) &&
-                u[key] >= str.length) { continue; }
-
-            u[key] = str.length;
-            o[key] = arr[i];
-        }
-
-        return Object.values(o);
-    }
-
-    /**
      * Iterate over every view, set the dXType and dXPath for every view
      * according to their position in the view hierarchy.
      *
@@ -94,36 +49,11 @@ define([
             if (level > 1) {
                 views[name].prototype.dXType = 'subview';
             }
-            //console.log(list[i], viewPaths[i], views[name].prototype.dXType);
         }
 
         if (subViewList.length > 0) {
             markViews(subViewList, views, viewPaths, ++level);
         }
-    }
-
-    /**
-     * Returns the appropriate view name for the user.
-     * If any system specific declarations are set, check the user os
-     * via dX/libs/is. If the test fails, omit the keyword (e.g. android).
-     *
-     * @param name
-     * @returns {string}
-     * @ignore
-     */
-
-    function checkSystem(name) {
-        var system = name.match(/([^!]+)![^!]+/)
-        if (system) {
-            system = system[1].split('/');
-            system = system.pop();
-
-            name = name.replace(new RegExp(system+'!', 'g'),
-                is.hasOwnProperty(system) &&
-                    is[system]()? system+'/' : '');
-        }
-
-        return name;
     }
 
     /**
@@ -137,6 +67,43 @@ define([
             viewNames[i] = viewNames[i].replace(/[^\/!]+!/g, '');
         }
         return viewNames;
+    }
+
+    /**
+     * Check the user system and replace any view
+     * declaration, if defined.
+     *
+     * @param {Array} views
+     * @returns {Array}
+     */
+
+    function resolveSystem(views) {
+        var paths = {}, m, res = [], view;
+
+        for (var i=views.length; i--;) {
+            m = views[i].match(/[^\/!]+!/g);
+            if (m) {
+                m = m[0].substr(0, m[0].length -1);
+                if (!paths[m]) { paths[m] = []; }
+                paths[m].push(views[i].replace(/[^\/!]+!/g, ''));
+            } else {
+                res.push(views[i]);
+            }
+        }
+
+        for (system in paths) {
+            if (!paths.hasOwnProperty(system)) { continue; }
+            if (is.hasOwnProperty(system) && is[system]()) {
+                for (i=paths[system].length; i--;) {
+                    view = paths[system][i];
+                    res.push(system+'/'+view);
+                    var j = res.indexOf(view);
+                    if (j !== -1) { res.splice(j, 1); }
+                }
+            }
+        }
+
+        return res;
     }
 
     /**
@@ -163,18 +130,9 @@ define([
             views = {};
 
             // Create view paths, resolve system declarations
-            _.each(dXViews, function(target) {
-                if (_.isArray(target)) {
-                    _.each(target, function(view) {
-                        viewPaths.push('views/'+checkSystem(view));
-                    });
-
-                } else {
-                    viewPaths.push('views/'+checkSystem(target));
-                }
+            viewPaths = _.map(resolveSystem(dXViews), function(view) {
+                return 'views/'+view;
             });
-
-            viewPaths = specialUnique(viewPaths);
 
             require(viewPaths, function() {
                 res = Array.prototype.slice.call(arguments, 0);

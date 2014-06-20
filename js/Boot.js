@@ -1,5 +1,5 @@
 // Welcome message
-console && console.log('Welcome to Dexter 0.6.4');
+console && console.log('Welcome to Dexter 0.6.5');
 
 /**
  *
