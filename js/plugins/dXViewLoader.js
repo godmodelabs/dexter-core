@@ -94,6 +94,7 @@ define([
             if (level > 1) {
                 views[name].prototype.dXType = 'subview';
             }
+            //console.log(list[i], viewPaths[i], views[name].prototype.dXType);
         }
 
         if (subViewList.length > 0) {
@@ -155,9 +156,10 @@ define([
                 return;
             }
 
-            var viewPaths, res, views;
+            var viewPaths, viewNames, res, views, i;
 
             viewPaths = [];
+            viewNames = [];
             views = {};
 
             // Create view paths, resolve system declarations
@@ -179,11 +181,13 @@ define([
 
                 for(i in res) {
                     if (!res.hasOwnProperty(i)) { continue; }
+                    viewNames.push(res[i].prototype.dXName);
+                    if (!res[i].prototype.dXName) { continue; }
                     views[res[i].prototype.dXName] = res[i];
                     res[i].prototype.dXViewList = views;
                 }
 
-                markViews(Object.keys(views), views, viewPaths);
+                markViews(viewNames, views, viewPaths);
 
                 log.yellow('registered views:\n     '+viewPaths.join(',\n     '));
                 load(views);
