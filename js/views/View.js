@@ -120,14 +120,11 @@ define([
         dXPath: null,
 
         /**
-         * The real, relative paths to this views subViews, if there
-         * are any mentioned in {@link dXView#dXSubViews}. It can be
-         * system specific (e.g. android/view) and will be set by the
-         * view loader.
-         * Used by {@link dXView#dXGetSubViews}.
+         * The viewLoader adds a reference to the view prototypes
+         * here, so that the view can instantiate any subviews.
          */
 
-        dXSubViewPaths: {},
+        dXViewList: null,
 
         /**
          * This array contains a list of the required subviews for
@@ -174,7 +171,7 @@ define([
         dXRouter: null,
 
         /**
-         * Tries to return every subview mentioned in {@link dXView#dXSubViewPaths}.
+         * Tries to return every subview mentioned in {@link dXView#dXSubViews}.
          * If a view is not yet cached, create a new instance and
          * add this scope.
          *
@@ -182,14 +179,12 @@ define([
          */
 
         dXGetSubViews: function dXGetSubViews() {
-            var i, subView, SubView, subViews, subViewName, subViewNames,
+            var i, subView, SubView, subViews, subViewName, $view,
                 that = this;
 
             subViews = {};
-            subViewNames = Object.keys(this.dXSubViewPaths);
-
-            for (i=subViewNames.length; i--;) {
-                subViewName = subViewNames[i];
+            for (i=this.dXSubViews.length; i--;) {
+                subViewName = this.dXSubViews[i].replace(/[^\/!]+!/g, '');
                 subView = [];
 
                 if (subViewName in this.dXSubViewCache) {
@@ -200,9 +195,19 @@ define([
                         }
                     });
 
-                } else {
-                    SubView = require('views/'+this.dXSubViewPaths[subViewName]);
-                    this.$el.find('[data-dX='+subViewName+']').each(function(index) {
+                } else if (subViewName in this.dXViewList) {
+
+                    SubView = this.dXViewList[subViewName];
+                    $view = this.$el.find('[data-dX='+subViewName+']');
+
+                    if ($view.length === 0) {
+                        debug.error(
+                            'Missing container for subview #'+subViewName+'!',
+                            'Create at least one with data-dX='+subViewName+' in '+this.dXPath+'.html');
+                        continue;
+                    }
+
+                    $view.each(function(index) {
                         var $this = $(this);
                         $this.attr('data-dX', subViewName+'-'+index);
 
@@ -213,14 +218,17 @@ define([
                         });
                         subView.push(new SubView());
                     });
+
+                } else {
+                    debug.error(
+                        'Unknown subview #'+subViewName+'!',
+                        'Create a view and declare it in configs/dXViews.conf.js');
                 }
 
                 subViews[subViewName] = subView;
             }
 
-            this.dXSubViewCache = subViews;
-
-            return this.dXSubViewCache;
+            return this.dXSubViewCache = subViews;
         },
 
         /**
@@ -339,25 +347,22 @@ define([
         dXLeave: function dXLeave(propagate) {
             debug.palevioletred('leave #'+this.dXName);
 
-            var i, subView,
-                subViewNames = Object.keys(this.dXSubViewPaths);
-
             this.dXCallLeave();
 
             /*
              * Tell subviews to leave.
              */
 
-            if (propagate !== false) {
-                for (i=subViewNames.length; i--;) {
-                    subView = this.dXSubViewCache[subViewNames[i]];
+            if (propagate !== false &&
+                Object.keys(this.dXSubViewCache).length > 0) {
 
-                    _.each(subView, function(view) {
+                _.each(this.dXSubViewCache, function(views) {
+                    _.each(views, function(view) {
                         if ('dXLeave' in view) {
                             view.dXLeave();
                         }
                     });
-                }
+                });
             }
 
             /*

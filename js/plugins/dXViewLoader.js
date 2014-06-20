@@ -1,5 +1,5 @@
 /**
- * Get every view mentioned in dXViews.conf.js.
+ * Get every view mentioned at dXViews.conf.js.
  *
  * @author: Riplexus <riplexus@gmail.com>
  */
@@ -17,9 +17,7 @@ define([
     is
 ) {
 
-    var log = debug('DX'),
-        topLevel = true,
-        paths = [];
+    var log = debug('DX');
 
     /**
      * Returns the values of the provided object.
@@ -67,84 +65,40 @@ define([
     }
 
     /**
-     * Get the necessary view objects via require.js. Look for any
-     * subviews and get them recursively.
-     * Manage the real paths for the views by setting the dXPath
-     * and dXSubViewPaths values to the view prototypes (move this
-     * to another location maybe?)
+     * Iterate over every view, set the dXType and dXPath for every view
+     * according to their position in the view hierarchy.
      *
-     * @param require
-     * @param list
-     * @param ret
-     * @param callback
-     * @ignore
+     * @param {Array} list
+     * @param {object} views
+     * @param {Array} viewPaths
+     * @param {number} [level]
      */
 
-    function getViewList(require, list, ret, callback) {
-        var views, i, j, view, subViews, subViewList, viewList, path, key;
+    function markViews(list, views, viewPaths, level) {
+        var i, name, subViewList;
+        if (!level) { level = 1; }
 
-        viewList = [];
+        subViewList = [];
+        for (i=list.length; i--;) {
+            name = list[i];
 
-        require(list, function() {
-            views = Array.prototype.slice.call(arguments, 0);
+            if (!(name in views)) { continue; }
 
-            for (i=views.length; i--;) {
-                view = views[i];
-                subViewList = [];
+            subViewList = subViewList.concat(views[name].prototype.dXSubViews);
+            subViewList = removeSystem(subViewList);
 
-                // Tell the view his real path
-                view.prototype.dXPath = list[i].replace('views/', '');
-
-                // Reference the path for logging
-                paths.push(view.prototype.dXPath);
-
-                // Each view has to know the path of his subViews
-                view.prototype.dXSubViewPaths = {};
-
-                // Tell subview his type
-                if (!topLevel) {
-                    view.prototype.dXType = 'subview';
-                }
-
-                subViews = view.prototype.dXSubViews;
-                if (subViews) {
-                    for (j=subViews.length; j--;) {
-                        // Check system declarations
-                        path = checkSystem(subViews[j]);
-
-                        // dXName of the subview
-                        key = subViews[j].substr(subViews[j].search('!')+1);
-
-                        // The first, most specific path has priority if already defined
-                        if (!(key in view.prototype.dXSubViewPaths &&
-                            view.prototype.dXSubViewPaths[key].split('/').length >= path.split('/').length)) {
-                            // Save the subView path, (dXName => path)
-                            view.prototype.dXSubViewPaths[key] = path;
-                        }
-                        // Save the path to fetch the subView object
-                        subViewList.push('views/'+path);
-                    }
-                }
-
-                // Remove duplicate subViews (e.g. from system declarations)
-                subViewList = specialUnique(subViewList);
-
-                // Add the subViews of this view to the list for requiring
-                viewList = viewList.concat(subViewList);
-
-                // Save this view object for returning
-                ret[view.prototype.dXName] = view;
+            if (level === 1) {
+                views[name].prototype.dXPath = viewPaths[i].replace('views/', '');
             }
 
-            // If there are any subViews who need to be fetched, do it
-            if (viewList.length === 0) {
-                callback(ret);
-            } else {
-                topLevel = false;
-                getViewList(require, viewList, ret, callback);
+            if (level > 1) {
+                views[name].prototype.dXType = 'subview';
             }
+        }
 
-        });
+        if (subViewList.length > 0) {
+            markViews(subViewList, views, viewPaths, ++level);
+        }
     }
 
     /**
@@ -158,18 +112,30 @@ define([
      */
 
     function checkSystem(name) {
-        if (name.match(/[^!]+![^!]+/)) {
-            name = name.split('!');
-            if (is.hasOwnProperty(name[0]) &&
-                is[name[0]]()) {
-                name = name.join('/');
+        var system = name.match(/([^!]+)![^!]+/)
+        if (system) {
+            system = system[1].split('/');
+            system = system.pop();
 
-            } else {
-                name = name[1];
-            }
+            name = name.replace(new RegExp(system+'!', 'g'),
+                is.hasOwnProperty(system) &&
+                    is[system]()? system+'/' : '');
         }
 
         return name;
+    }
+
+    /**
+     * Remove any system declarations.
+     *
+     * @param {Array} viewNames
+     */
+
+    function removeSystem(viewNames) {
+        for (var i=viewNames.length; i--;) {
+            viewNames[i] = viewNames[i].replace(/[^\/!]+!/g, '');
+        }
+        return viewNames;
     }
 
     /**
@@ -184,16 +150,17 @@ define([
 
     return {
         load: function(resourceId, require, load, config) {
-            if (config.isBuild) { return load(); }
+            if (config.isBuild) {
+                load();
+                return;
+            }
 
-            var viewPaths, ret;
+            var viewPaths, res, views;
 
             viewPaths = [];
-            ret = {};
+            views = {};
 
-            // Collect every view path, needed for rendering
-            // Resolve system specific declarations.
-
+            // Create view paths, resolve system declarations
             _.each(dXViews, function(target) {
                 if (_.isArray(target)) {
                     _.each(target, function(view) {
@@ -205,12 +172,21 @@ define([
                 }
             });
 
-            // Retrieve the views recursively.
             viewPaths = specialUnique(viewPaths);
 
-            getViewList(require, viewPaths, ret, function(ret) {
-                log.yellow('registered views:\n     '+paths.join(',\n     '));
-                load(ret);
+            require(viewPaths, function() {
+                res = Array.prototype.slice.call(arguments, 0);
+
+                for(i in res) {
+                    if (!res.hasOwnProperty(i)) { continue; }
+                    views[res[i].prototype.dXName] = res[i];
+                    res[i].prototype.dXViewList = views;
+                }
+
+                markViews(Object.keys(views), views, viewPaths);
+
+                log.yellow('registered views:\n     '+viewPaths.join(',\n     '));
+                load(views);
             });
         }
     };

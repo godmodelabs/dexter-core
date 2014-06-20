@@ -3,16 +3,31 @@ var fs = require('fs'),
     root = __dirname+'/../../../',
     viewFolder = 'js/views',
     viewFile = 'configs/dXViews.conf.js',
+    is = require('../js/libs/is'),
+    systems = Object.keys(is),
     views;
 
 walk(root+viewFolder, function(err, views) {
     if (err) { throw err; }
 
     views = views.map(function(file) {
-        return file
+        file = file
             .replace(/(.*\/js\/views)\//, '')
-            .replace('.js', '')
-            .replace(/\/|\\/, '!');
+            .replace('.js', '');
+
+        var s = file.split('/');
+        if (s.length > 1) {
+            for (var i=s.length; i--;) {
+                if (systems.indexOf(s[i]) >= 0) {
+                    s[i] += '!';
+                } else {
+                    s[i] += '/';
+                }
+            }
+            file = s.join('');
+            file = file.substring(0, file.length - 1);
+        }
+        return file;
     });
 
     views = JSON.stringify(views);

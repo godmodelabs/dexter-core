@@ -4,6 +4,12 @@
  * @source http://www.abeautifulsite.net/blog/2011/11/detecting-mobile-devices-with-javascript/
  */
 
+if (typeof module === 'object' && typeof define !== 'function') {
+    define = function (factory) {
+        module.exports = factory(require, exports, module);
+    };
+}
+
 define(function() {
 
     var is = {

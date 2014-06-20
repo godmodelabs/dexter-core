@@ -121,8 +121,8 @@ define([
 
                 if (this.viewList[viewName].prototype.dXType !== 'static') {
                     debug.error(
-                        'View #'+viewName+' not static and not routed!',
-                        'Either extend dX/StaticView or declare in configs/dXRoutes.conf.js');
+                        'View #'+viewName+' not subview, static or routed!',
+                        'Either mention it as a SubView, extend dX/StaticView or declare it in configs/dXRoutes.conf.js');
                     continue;
                 }
 

@@ -54,14 +54,14 @@ define([
                 return;
             }
 
-            if (_.indexOf(dXViews, this.dXName) === -1) {
+            if (_.indexOf(Object.keys(this.dXViewList), this.dXName) === -1) {
                 debug.error(
                     'Missing view declaration for item #'+this.dXName+'!',
                     'Add \''+this.dXName+'\' in /configs/dXViews.conf.js');
                 return 'asd';
             }
 
-            var template = this.dXTemplateRenderer(require('text!templates/'+this.dXName+'.html'),
+            var template = this.dXTemplateRenderer(require('text!templates/'+this.dXPath+'.html'),
                 typeof this.dXTemplateData === 'function'?
                     this.dXTemplateData(this) : this.dXTemplateData);
 
