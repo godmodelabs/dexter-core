@@ -5,16 +5,21 @@ var fs = require('fs'),
     viewFile = 'configs/dXViews.conf.js',
     views;
 
-views = fs.readdirSync(root+viewFolder);
+walk(root+viewFolder, function(err, views) {
+    if (err) { throw err; }
 
-views = views.map(function(file) {
-    return file.replace(/\.js/, '');
+    views = views.map(function(file) {
+        return file
+            .replace(/(.*\/js\/views)\//, '')
+            .replace('.js', '')
+            .replace(/\/|\\/, '!');
+    });
+
+    views = JSON.stringify(views);
+    views = views.replace(/\["/, '[\n'+Array(9).join(' ')+'"')
+        .replace(/"\]/, '"\n    ]')
+        .replace(/,"/g, ',\n'+Array(9).join(' ')+'"');
+    views = 'define(function() {\n    return '+views+';\n});';
+
+    fs.writeFileSync(root+viewFile, views);
 });
-
-views = JSON.stringify(views);
-views = views.replace(/\["/, '[\n'+Array(9).join(' ')+'"')
-             .replace(/"\]/, '"\n    ]')
-             .replace(/,"/g, ',\n'+Array(9).join(' ')+'"');
-views = 'define(function() {\n    return '+views+';\n});';
-
-fs.writeFileSync(root+viewFile, views);
