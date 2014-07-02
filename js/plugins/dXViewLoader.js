@@ -51,6 +51,13 @@ define([
             }
         }
 
+        if (level > 30) {
+            debug.error(
+                'Sub views to deeply nested!',
+                'Maybe you have a circular hierarchy');
+            return;
+        }
+
         if (subViewList.length > 0) {
             markViews(subViewList, views, viewPaths, ++level);
         }
