@@ -10,12 +10,11 @@ var fs = require('fs'),
     includes = [],
     result;
 
-//views = fs.readdirSync(root+viewFolder);
 walk(root+viewFolder, function(err, views) {
     if (err) { throw err; }
 
     includes = includes.concat(views.map(function(file) {
-        return file.replace(/(.*\/js\/views)/, 'views');
+        return file.replace(/(.*\/js\/views)/, 'views').replace(/\.js$/, '');
     }));
 
     walk(root+templateFolder, function(err, templates) {
