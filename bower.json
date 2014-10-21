@@ -1,12 +1,12 @@
 {
     "name": "dexter-core",
-    "version": "0.6.7",
-    "ignore": {
+    "version": "0.6.8",
+    "ignore": [
         ".gitignore",
         ".git",
         ".idea",
         "README.md",
         "package.json",
         "LICENSE"
-    }
+    ]
 }
