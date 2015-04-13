@@ -171,6 +171,17 @@ define([
         dXRouter: null,
 
         /**
+         * Any view can assign a html snippet to this attribute. It will
+         * then be inserted until every enter event is finished and every
+         * subview is loaded. Can be enabled/disabled with dXConfig.setLoading,
+         * dXConfig.clearLoading.
+         *
+         * @type {?string}
+         */
+
+        dXLoading: null,
+
+        /**
          * Tries to return every subview mentioned in {@link dXView#dXSubViews}.
          * If a view is not yet cached, create a new instance and
          * add this scope.
@@ -414,9 +425,11 @@ define([
                 this.$el.dXPosition = 'static';
             }
 
-            this.$el.prepend($('<div></div>')
-                .addClass('loading')
-                .html(require('text!templates/loading.html')));
+            if (this.dXLoading) {
+                this.$el.prepend($('<div></div>')
+                    .addClass('loading')
+                    .html(this.dXLoading));
+            }
         },
 
         /**

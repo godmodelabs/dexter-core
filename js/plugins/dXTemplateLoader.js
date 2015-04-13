@@ -37,8 +37,6 @@ define([
                 }
             }
 
-            templateList.push('text!templates/loading.html');
-
             debug.yellow('register templates:\n     '+templateList.join(',\n     '));
             require(templateList, function() {
                 load(Array.prototype.slice.call(arguments, 0));
