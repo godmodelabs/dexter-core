@@ -12,10 +12,10 @@ define([
     'jquery',
     'backbone',
     'modernizr',
-    'configs/dXRoutes.conf',
-    'configs/dXViews.conf',
+    'json!configs/dX.json',
     'dX/ViewLoader!',
     'dX/TemplateLoader!',
+    'dX/SnippetLoader!',
     'dX/libs/debug',
     'dX/libs/pipe',
     'dX/libs/flip',
@@ -25,10 +25,10 @@ define([
     _, $,
     Backbone,
     Modernizr,
-    routesConf,
-    dXViews,
+    config,
     viewList,
     templateList,
+    snippetList,
     debug,
     pipe,
     flip,
@@ -38,19 +38,19 @@ define([
     debug = debug('DX');
 
     var $body = $('body'),
-        viewRoutes = flip(routesConf),
+        viewRoutes = flip(config.routes),
         staticViews = _.difference(_.keys(viewList), _.keys(viewRoutes)),
         errCheck = _.difference(_.keys(viewRoutes), _.keys(viewList));
 
     if (errCheck.length) {
         debug.error(
             'Missing view declaration for routed #'+errCheck.join(', #')+'!',
-            'Add \''+errCheck.join()+'\' in /configs/dXViews.conf.js');
+            'Add \''+errCheck.join()+'\' under views in /configs/dX.json');
     }
 
     return new (Backbone.Router.extend(/** @lends Router.prototype */{
 
-        routes: routesConf,
+        routes: config.routes,
 
         /**
          * Stores the current, route-linked view.
@@ -122,7 +122,7 @@ define([
                 if (this.viewList[viewName].prototype.dXType !== 'static') {
                     debug.error(
                         'View #'+viewName+' not subview, static or routed!',
-                        'Either mention it as a SubView, extend dX/StaticView or declare it in configs/dXRoutes.conf.js');
+                        'Either mention it as a SubView, extend dX/StaticView or declare it under routes in configs/dX.json');
                     continue;
                 }
 

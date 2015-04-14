@@ -6,3 +6,4 @@ config.codekit
 configs/dXBuild.min.js
 configs/npm-debug.log
 npm-debug.log
+parent

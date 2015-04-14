@@ -70,7 +70,9 @@ function debug(name) {
      * color plugin by Riplexus
      */
 
-    var colors = require('configs/dXDebug.conf').colors;
+    var config = require('json!configs/dX.json');
+    if (typeof config === 'string') { config = JSON.parse(config); }
+    var colors = config.debug.colors;
     obj.colored = function() {
         var args = Array.prototype.slice.call(arguments);
         var color = args.pop();

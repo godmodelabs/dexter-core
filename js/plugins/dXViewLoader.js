@@ -1,18 +1,18 @@
 /**
- * Get every view mentioned at dXViews.conf.js.
+ * Get every view mentioned at dX.json configuration.
  *
  * @author: Riplexus <riplexus@gmail.com>
  */
 
 define([
     'underscore',
-    'configs/dXViews.conf',
+    'json!configs/dX.json',
     'dX/libs/debug',
     'dX/libs/is',
     'dX/Shim!Object.keys'
 ], function(
     _,
-    dXViews,
+    config,
     debug,
     is
 ) {
@@ -98,7 +98,7 @@ define([
             }
         }
 
-        for (system in paths) {
+        for (var system in paths) {
             if (!paths.hasOwnProperty(system)) { continue; }
             if (is.hasOwnProperty(system) && is[system]()) {
                 for (i=paths[system].length; i--;) {
@@ -124,8 +124,8 @@ define([
      */
 
     return {
-        load: function(resourceId, require, load, config) {
-            if (config.isBuild) {
+        load: function(resourceId, require, load, conf) {
+            if (conf.isBuild) {
                 load();
                 return;
             }
@@ -137,7 +137,7 @@ define([
             views = {};
 
             // Create view paths, resolve system declarations
-            viewPaths = _.map(resolveSystem(dXViews), function(view) {
+            viewPaths = _.map(resolveSystem(config.views), function(view) {
                 return 'views/'+view;
             });
 

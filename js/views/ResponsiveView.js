@@ -5,7 +5,7 @@ define([
     'dX/libs/debug',
     'dX/libs/applyMaybe',
     'dX/View',
-    'configs/dXStates.conf',
+    'json!configs/dX.json',
     'ssm'
 ], function(
     _, $,
@@ -13,7 +13,7 @@ define([
     debug,
     applyMaybe,
     dXView,
-    statesConf,
+    config,
     ssm
 ) {
 
@@ -29,34 +29,33 @@ define([
      * Initialize SimpleStateManager.
      */
 
-    for (stateName in statesConf) {
-        if (statesConf.hasOwnProperty(stateName)) {
+    for (stateName in config.states) {
+        if (!config.states.hasOwnProperty(stateName)) { continue; }
 
-            state = {
-                id: stateName,
-                width: statesConf[stateName],
-                onEnter: (function(stateName) {
-                    return function() {
-                        debug.lightsalmon('state change to <'+stateName+'>');
+        state = {
+            id: stateName,
+            width: config.states[stateName],
+            onEnter: (function(stateName) {
+                return function() {
+                    debug.lightsalmon('state change to <'+stateName+'>');
 
-                        var view, viewName;
+                    var view, viewName;
 
-                        currentState = stateName;
+                    currentState = stateName;
 
-                        for (viewName in viewList) {
-                            if (viewList.hasOwnProperty(viewName)) {
-                                view = viewList[viewName];
+                    for (viewName in viewList) {
+                        if (viewList.hasOwnProperty(viewName)) {
+                            view = viewList[viewName];
 
-                                view.dXSsmState = currentState;
-                                view.dXLeave(false); // false: don't propagate
-                                view.dXEnter(false); // false: don't propagate
-                            }
+                            view.dXSsmState = currentState;
+                            view.dXLeave(false); // false: don't propagate
+                            view.dXEnter(false); // false: don't propagate
                         }
-                    };
-                })(stateName)
-            };
-            ssm.addState(state);
-        }
+                    }
+                };
+            })(stateName)
+        };
+        ssm.addState(state);
     }
     ssm.ready();
 
@@ -64,8 +63,8 @@ define([
      * dXResponsiveView extends the basic dXView of the dexter
      * framework. It provides additional enter functions, dependent
      * of the current application state. States are defined in the
-     * configs/dXStates.conf.js file as a key value pair of the state
-     * name and the minimum width of the page. E.g. mobile: 400
+     * configs/dX.json configuration file as a key value pair of the
+     * state name and the minimum width of the page. E.g. mobile: 400
      * describes, that the application is in the state 'mobile'
      * if the page width is under 400 px.
      * The enter functions have the state name appended, e.g.

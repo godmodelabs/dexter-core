@@ -1,6 +1,6 @@
 {
   "name": "dexter-core",
-  "version": "0.6.9",
+  "version": "0.7.0",
   "description": "Core prototypes and scripts for dexter",
   "main": "index.js",
   "scripts": {

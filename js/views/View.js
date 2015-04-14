@@ -233,13 +233,41 @@ define([
                 } else {
                     debug.error(
                         'Unknown subview #'+subViewName+'!',
-                        'Create a view and declare it in configs/dXViews.conf.js');
+                        'Create a view and declare it under views in configs/dX.json');
                 }
 
                 subViews[subViewName] = subView;
             }
 
             return this.dXSubViewCache = subViews;
+        },
+
+
+        /**
+         * Tries to return every subview mentioned in {@link dXView#dXSubViews}.
+         * If a view is not yet cached, create a new instance and
+         * add this scope.
+         */
+
+        dXGetSnippets: function dXGetSnippets() {
+            var $targets = this.$el.find('[data-dX-snippet]');
+            if ($targets.length === 0) { return; }
+            var targets = [];
+
+            $targets.each(function() {
+                targets.push('text!snippets/'+$(this).attr('data-dX-snippet')+'.html');
+            });
+
+            for (var i=0, l=targets.length, data, attr, attrList; i<l; i++) {
+                data = {};
+                attrList = $targets.get(i).attributes;
+                for (attr in attrList) {
+                    if (!attrList.hasOwnProperty(attr)) { continue; }
+                    if (!attrList[attr].name || attrList[attr].name.substr(0,11) !== 'data-dx-var') { continue; }
+                    data[attrList[attr].name.substr(12)] = attrList[attr].value;
+                }
+                $targets.eq(i).replaceWith(this.dXTemplateRenderer(require(targets[i]), data));
+            }
         },
 
         /**
@@ -314,6 +342,7 @@ define([
              */
 
             if (propagate !== false) {
+                this.dXGetSnippets();
                 this.dXGetSubViews();
             }
 

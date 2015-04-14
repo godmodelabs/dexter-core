@@ -24,7 +24,7 @@ define([
         load: function(resourceId, require, load, config) {
             if (config.isBuild) { return load(); }
 
-            var name, i;
+            var name;
 
             if (templateList.length) {
                 load(templateList);
