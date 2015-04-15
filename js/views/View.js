@@ -373,6 +373,7 @@ define([
                 .empty()
                 .append(template)
                 .attr('id', this.dXId)
+                .addClass(this.dXName)
                 .removeAttr('data-dX')
                 .show();
         },
@@ -413,6 +414,7 @@ define([
                 this.dXCache = this.$el.contents().detach();
             }
 
+            this.$el.removeClass(this.dXName);
             this.$el.attr('data-dX', this.dXName+'-'+this.dXIndex);
             this.$el.hide();
         },

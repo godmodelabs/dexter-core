@@ -163,7 +163,7 @@ define([
                      */
 
                     this.on('route:'+viewName, function() {
-                        var path, that = this;
+                        var that = this, i, l, prev, exp;
 
                         /*
                          * Store the route parameters in <dXRouter.parameters> for the
@@ -182,19 +182,28 @@ define([
                          * be assigned to the body for any route specific css code.
                          */
 
-                        if (!(viewName in this.routeClasses)) {
-                            path = this.viewRoutes[viewName][0];
-                            this.routeClasses[viewName] = [];
+                        this.routeClasses = [];
+                        if (this.path === '') {
+                            this.routeClasses.push('dXRoute-index');
 
-                            path = path.replace(/(\*path|:)/g, '').split('/');
-                            while(path.length) {
-                                this.routeClasses[viewName]
-                                    .push('route-'+(path.join('-') || 'index'));
-                                path.pop();
+                        } else {
+                            if (viewName in this.viewRoutes) {
+                                for (i=0, l=this.viewRoutes[viewName].length; i<l; i++) {
+                                    exp = new RegExp('^'+this.viewRoutes[viewName][i].replace(/:\w+/, '\\w+')+'$');
+                                    if (exp.exec(this.path)) {
+                                        this.routeClasses = this.viewRoutes[viewName][i].replace(':', '').split('/');
+                                        break;
+                                    }
+                                }
+                                for (i=0, l=this.routeClasses.length, prev='dXRoute'; i<l; i++) {
+                                    prev += '-'+this.routeClasses[i];
+                                    this.routeClasses[i] = prev;
+                                }
                             }
                         }
-                        removeClasses($body[0], 'route-');
-                        $body.addClass(this.routeClasses[viewName].join(' '));
+
+                        removeClasses($body[0], 'dXRoute-');
+                        $body.addClass(this.routeClasses.join(' '));
 
                         /*
                          * Leave current view.
