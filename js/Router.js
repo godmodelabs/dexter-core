@@ -56,7 +56,7 @@ define([
          * Stores the current, route-linked view.
          */
 
-        currentView: {},
+        currentView: [],
 
         /**
          * Stores the routed views, if loaded.
@@ -242,6 +242,10 @@ define([
                                 }
                             });
                         }
+
+                        // emit navigation event with previous and entering view
+                        pipe.emit('navigation', this.path, this.currentView, view);
+                        pipe.emit('navigation/'+this.path, this.currentView, view);
 
                         // Reference current router-enabled view
                         this.currentView = view;

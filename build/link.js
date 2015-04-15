@@ -6,13 +6,13 @@ fs.readFile('./index.html', 'utf8', function (err,data) {
         console.log(err);
         return;
     }
-    
+
     var result;
-    
+
     if (isBuild) {
-        result = data.replace(/data-main="js\/main"/g, 'data-main="js/main-build"');
+        result = data.replace(/data-main="\/js\/main"/g, 'data-main="/js/main-build"');
     } else {
-        result = data.replace(/data-main="js\/main-build"/g, 'data-main="js/main"');
+        result = data.replace(/data-main="\/js\/main-build"/g, 'data-main="/js/main"');
     }
 
     fs.writeFile('./index.html', result, 'utf8', function (err) {
