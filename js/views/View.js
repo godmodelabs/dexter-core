@@ -49,6 +49,8 @@ define([
          */
 
         initialize: function initialize() {
+            this.$parent = this.$el.parent();
+            this.dXDomIndex = this.$parent.children().index(this.$el);
             this.dXId = 'dX-' + uuid();
             this.dXConnect();
             this.dXEnter();
@@ -73,6 +75,18 @@ define([
          */
 
         $el: null,
+
+        /**
+         *
+         */
+
+        $parent: null,
+
+        /**
+         *
+         */
+
+        dXDomIndex: 0,
 
         /**
          * The id of this view. A uuid will be generated on
@@ -115,6 +129,8 @@ define([
          * specific (e.g. android/view) and will be set by the
          * view loader.
          * Used by the template loader to get the views template.
+         *
+         * @type {string}
          */
 
         dXPath: null,
@@ -122,6 +138,8 @@ define([
         /**
          * The viewLoader adds a reference to the view prototypes
          * here, so that the view can instantiate any subviews.
+         *
+         * @type {Object}
          */
 
         dXViewList: null,
@@ -133,6 +151,8 @@ define([
          * Overwrite this array to register subviews.
          * It can contain any system specific declarations
          * (e.g. 'android!view').
+         *
+         * @type {Array.<dXView>}
          */
 
         dXSubViews: [],
@@ -141,6 +161,8 @@ define([
          * The subview cache contains the instances of the subviews.
          * They are always extending dXView. The keys are the
          * subview dXNames.
+         *
+         * @type {Object}
          */
 
         dXSubViewCache: {},
@@ -154,10 +176,11 @@ define([
          * manually. If you want to leave the view present after
          * leaving, set the flag here. The template name can be
          * overwritten too (defaults to the provided dXName).
+         *
+         * @type {Object}
          */
 
         dXConfig: {
-            clearViewOnLeave: true,
             setLoading: true,
             clearLoading: true,
             templateName: null
@@ -166,6 +189,8 @@ define([
         /**
          * A reference to the application dXRouter. Will be set by the
          * router himself.
+         *
+         * @type {dXRouter}
          */
 
         dXRouter: null,
@@ -374,8 +399,11 @@ define([
                 .append(template)
                 .attr('id', this.dXId)
                 .addClass(this.dXName)
-                .removeAttr('data-dX')
-                .show();
+                .removeAttr('data-dX');
+
+            var $children = this.$parent.children();
+            $children.eq($children.length-1 < this.dXDomIndex? $children.length-1 : this.dXDomIndex)
+                .after(this.$el);
         },
 
         /**
@@ -407,16 +435,15 @@ define([
             }
 
             /*
-             * Cache html.
+             * Cache template, save current index (can change during runtime!)
+             * and detach $el.
              */
 
-            if (this.dXConfig.clearViewOnLeave) {
-                this.dXCache = this.$el.contents().detach();
-            }
-
+            this.dXCache = this.$el.contents().detach();
             this.$el.removeClass(this.dXName);
             this.$el.attr('data-dX', this.dXName+'-'+this.dXIndex);
-            this.$el.hide();
+            this.dXDomIndex = this.$parent.children().index(this.$el);
+            this.$el.detach();
         },
 
         /**
@@ -453,7 +480,7 @@ define([
         dXSetLoading: function dXSetLoading() {
             if (this.$el.css('position') === 'static') {
                 this.$el.css('position', 'relative');
-                this.$el.dXPosition = 'static';
+                this.$el.dXCssPositionStatic = true;
             }
 
             if (this.dXLoading) {
@@ -469,9 +496,9 @@ define([
          */
 
         dXClearLoading: function dXClearLoading() {
-            if (this.$el.dXPosition) {
-                this.$el.css('position', this.$el.dXPosition);
-                delete this.$el.dXPosition;
+            if (this.$el.dXCssPositionStatic) {
+                this.$el.css('position', '');
+                delete this.$el.dXCssPositionStatic;
             }
 
             this.$el.children('.loading').remove();

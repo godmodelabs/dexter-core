@@ -73,6 +73,7 @@ define([
      * It uses the simple state manager to manage the states.
      *
      * @class dXResponsiveView
+     * @extends dXView
      * @author Riplexus <riplexus@gmail.com>
      * @example
      * dXResponsiveView.extend({

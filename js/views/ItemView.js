@@ -24,6 +24,7 @@ define([
      * if items are added to the collection.
      *
      * @class dXItem
+     * @extends dXView
      * @author Riplexus <riplexus@gmail.com>
      */
 
@@ -49,6 +50,13 @@ define([
                 debug.error(
                     'Missing dXName for item view!',
                     'Attribute dXName is required for every dXView');
+                return;
+            }
+
+            if (!this.dXViewList) {
+                debug.error(
+                    'Item view not loaded via dXViewLoader!',
+                    'Add the path of '+this.dXName+' under views in /configs/dX.json');
                 return;
             }
 

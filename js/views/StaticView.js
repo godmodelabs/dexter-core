@@ -18,6 +18,7 @@ define([
     /**
      *
      * @class StaticView
+     * @extends dXView
      * @author Riplexus <riplexus@gmail.com>
      * @example
      * StaticView.extend({
@@ -30,7 +31,7 @@ define([
         /**
          * Mark this views as static.
          */
-        
+
         dXType: 'static'
     });
 
