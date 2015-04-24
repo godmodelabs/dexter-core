@@ -95,6 +95,32 @@ define([
         parameters: [],
 
         /**
+         * Find and return current route by history.fragment.
+         *
+         * @returns {string}
+         */
+
+        getRoute: function() {
+            this.path = Backbone.history.fragment;
+
+            if (this.path === '') {
+                this.currentRoute = 'index';
+                return this.currentRoute;
+            }
+            for (var viewName in this.viewRoutes) {
+                if (!this.viewRoutes.hasOwnProperty(viewName)) { continue; }
+                for (var i=0, l=this.viewRoutes[viewName].length, exp; i < l; i++) {
+                    if (this.viewRoutes[viewName][i] === '*path') { continue; }
+                    exp = new RegExp('^' + this.viewRoutes[viewName][i].replace(/:\w+/, '\\w+') + '$');
+                    if (exp.exec(this.path)) {
+                        this.currentRoute = this.viewRoutes[viewName][i];
+                        return this.currentRoute;
+                    }
+                }
+            }
+        },
+
+        /**
          * The main behaviour of the router is described here.
          * Load static views first, register the routed views
          * afterwards and manage the behaviour on route change.
@@ -103,6 +129,8 @@ define([
         start: function() {
             var i, view, viewName, $view,
                 that = this;
+
+            this.getRoute();
 
             /*
              * Load static views.
@@ -169,7 +197,9 @@ define([
                      */
 
                     this.on('route:'+viewName, function() {
-                        var that = this, i, l, prev, exp;
+                        var that = this, i, l, prev;
+
+                        this.getRoute();
 
                         /*
                          * Store the route parameters in <dXRouter.parameters> for the
@@ -179,27 +209,8 @@ define([
                         if (arguments[0] !== null) {
                             this.parameters = Array.prototype.slice.call(arguments);
                         }
-                        this.path = Backbone.history.fragment;
 
                         debug.lightblue('navigate to /'+this.path);
-
-                        /*
-                         * Get current route by the requested view.
-                         */
-
-                        if (this.path === '') {
-                            this.currentRoute = 'index';
-                        } else {
-                            if (viewName in this.viewRoutes) {
-                                for (i = 0, l = this.viewRoutes[viewName].length; i < l; i++) {
-                                    exp = new RegExp('^' + this.viewRoutes[viewName][i].replace(/:\w+/, '\\w+') + '$');
-                                    if (exp.exec(this.path)) {
-                                        this.currentRoute = this.viewRoutes[viewName][i];
-                                        break;
-                                    }
-                                }
-                            }
-                        }
 
                         /*
                          * Create a list of route classes for the current view, will
