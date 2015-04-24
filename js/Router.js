@@ -59,6 +59,12 @@ define([
         currentView: [],
 
         /**
+         *
+         */
+
+        currentRoute: null,
+
+        /**
          * Stores the routed views, if loaded.
          */
 
@@ -178,30 +184,33 @@ define([
                         debug.lightblue('navigate to /'+this.path);
 
                         /*
-                         * Create a list of route classes for the current view, will
-                         * be assigned to the body for any route specific css code.
+                         * Get current route by the requested view.
                          */
 
-                        this.routeClasses = [];
                         if (this.path === '') {
-                            this.routeClasses.push('dXRoute-index');
-
+                            this.currentRoute = 'index';
                         } else {
                             if (viewName in this.viewRoutes) {
-                                for (i=0, l=this.viewRoutes[viewName].length; i<l; i++) {
-                                    exp = new RegExp('^'+this.viewRoutes[viewName][i].replace(/:\w+/, '\\w+')+'$');
+                                for (i = 0, l = this.viewRoutes[viewName].length; i < l; i++) {
+                                    exp = new RegExp('^' + this.viewRoutes[viewName][i].replace(/:\w+/, '\\w+') + '$');
                                     if (exp.exec(this.path)) {
-                                        this.routeClasses = this.viewRoutes[viewName][i].replace(':', '').split('/');
+                                        this.currentRoute = this.viewRoutes[viewName][i];
                                         break;
                                     }
-                                }
-                                for (i=0, l=this.routeClasses.length, prev='dXRoute'; i<l; i++) {
-                                    prev += '-'+this.routeClasses[i];
-                                    this.routeClasses[i] = prev;
                                 }
                             }
                         }
 
+                        /*
+                         * Create a list of route classes for the current view, will
+                         * be assigned to the body for any route specific css code.
+                         */
+
+                        this.routeClasses = this.currentRoute.replace(':', '').split('/');
+                        for (i=0, l=this.routeClasses.length, prev='dXRoute'; i<l; i++) {
+                            prev += '-'+this.routeClasses[i];
+                            this.routeClasses[i] = prev;
+                        }
                         removeClasses($body[0], 'dXRoute-');
                         $body.addClass(this.routeClasses.join(' '));
 
