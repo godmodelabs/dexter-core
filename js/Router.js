@@ -101,7 +101,7 @@ define([
          */
 
         getRoute: function() {
-            this.path = Backbone.history.fragment;
+            this.path = window.location.pathname.substr(1);
 
             if (this.path === '') {
                 this.currentRoute = 'index';
@@ -111,7 +111,7 @@ define([
                 if (!this.viewRoutes.hasOwnProperty(viewName)) { continue; }
                 for (var i=0, l=this.viewRoutes[viewName].length, exp; i < l; i++) {
                     if (this.viewRoutes[viewName][i] === '*path') { continue; }
-                    exp = new RegExp('^' + this.viewRoutes[viewName][i].replace(/:\w+/, '\\w+') + '$');
+                    exp = new RegExp('^' + this.viewRoutes[viewName][i].replace(/:\w+/g, '\\w+') + '$');
                     if (exp.exec(this.path)) {
                         this.currentRoute = this.viewRoutes[viewName][i];
                         return this.currentRoute;
