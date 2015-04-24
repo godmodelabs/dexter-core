@@ -402,8 +402,13 @@ define([
                 .removeAttr('data-dX');
 
             var $children = this.$parent.children();
-            $children.eq($children.length-1 < this.dXDomIndex? $children.length-1 : this.dXDomIndex)
-                .after(this.$el);
+            if ($children.length === 0) {
+                this.$parent.append(this.$el);
+            } else {
+                $children
+                    .eq($children.length-1 < this.dXDomIndex? $children.length-1 : this.dXDomIndex)
+                    .after(this.$el);
+            }
         },
 
         /**
