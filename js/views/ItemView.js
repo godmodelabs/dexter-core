@@ -18,17 +18,17 @@ define([
     debug = debug('DX');
 
     /**
-     * dXItem is the representation of a collection entry in
+     * dXItemView is the representation of a collection entry in
      * the dom. This and every extended view can be referenced
      * to any collections view attribute and will be created
      * if items are added to the collection.
      *
-     * @class dXItem
+     * @class dXItemView
      * @extends dXView
      * @author Riplexus <riplexus@gmail.com>
      */
 
-    var dXItem = dXView.extend(/** @lends dXItem.prototype */{
+    var dXItemView = dXView.extend(/** @lends dXItemView.prototype */{
 
         /**
          * Mark this view as item.
@@ -83,7 +83,7 @@ define([
         },
 
         /**
-         * The template has to be available at the {@link dXItem#el}
+         * The template has to be available at the {@link dXItemView#el}
          * call to support the data binding through epoxy. Thus we
          * have to override {@link dXView#dXEnter} to prevent the
          * html to be replaced.
@@ -112,5 +112,5 @@ define([
         }
     });
 
-    return dXItem;
+    return dXItemView;
 });

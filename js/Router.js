@@ -153,6 +153,11 @@ define([
                     continue;
                 }
 
+                if (this.viewList[viewName].prototype.dXType === 'single') {
+                    this.viewList[viewName].prototype.dXRouter = this;
+                    continue;
+                }
+
                 if (this.viewList[viewName].prototype.dXType !== 'static') {
                     debug.error(
                         'View #'+viewName+' not subview, static or routed!',
