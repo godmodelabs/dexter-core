@@ -210,74 +210,82 @@ define([
                             this.parameters = Array.prototype.slice.call(arguments);
                         }
 
-                        debug.lightblue('navigate to /'+this.path);
+                        $body.removeClass("dX-loadingFinished");
 
-                        /*
-                         * Create a list of route classes for the current view, will
-                         * be assigned to the body for any route specific css code.
-                         */
+                        this.preNavigation(function() {
+                            debug.lightblue('navigate to /'+this.path);
 
-                        this.routeClasses = this.currentRoute.replace(':', '').split('/');
-                        for (i=0, l=this.routeClasses.length, prev='dXRoute'; i<l; i++) {
-                            prev += '-'+this.routeClasses[i];
-                            this.routeClasses[i] = prev;
-                        }
-                        removeClasses($body[0], 'dXRoute-');
-                        $body.addClass(this.routeClasses.join(' '));
+                            /*
+                             * Leave current view.
+                             */
 
-                        /*
-                         * Leave current view.
-                         */
-
-                        _.each(this.currentView, function(view) {
-                            if ('dXLeave' in view) {
-                                view.dXLeave();
-                            }
-                        });
-
-                        /*
-                         * Get or create the desired view instance and render
-                         * it with his subviews with <dXEnter>. If the view is
-                         * not yet cached, the initialization will call <dXEnter>.
-                         */
-
-                        if (!(viewName in this.viewCache)) {
-                            view = [];
-                            $view = $body.find('[data-dX='+viewName+']');
-
-                            if (!$view.length) {
-                                debug.error(
-                                    'Missing container for #'+viewName+'!',
-                                    'Create one with data-dX='+viewName+' in your index.html');
-                                return;
-                            }
-
-                            $view.each(function(index) {
-                                var $this = $(this);
-                                $this.attr('data-dX', viewName+'-'+index);
-
-                                view.push(new (that.viewList[viewName].extend({
-                                    dXRouter: that,
-                                    dXIndex: index
-                                }))());
-                            });
-                            that.viewCache[viewName] = view;
-
-                        } else {
-                            view = this.viewCache[viewName];
-                            _.each(view, function(item) {
-                                if ('dXEnter' in item) {
-                                    item.dXEnter();
+                            _.each(this.currentView, function(view) {
+                                if ('dXLeave' in view) {
+                                    view.dXLeave();
                                 }
                             });
-                        }
 
-                        // emit navigation event with previous and entering view
-                        pipe.emit('navigation', this.path, this.currentView, view);
-                        pipe.emit('navigation/'+this.path, this.currentView, view);
+                            /*
+                             * Get or create the desired view instance and render
+                             * it with his subviews with <dXEnter>. If the view is
+                             * not yet cached, the initialization will call <dXEnter>.
+                             */
 
-                        // Reference current router-enabled view
-                        this.currentView = view;
+                            if (!(viewName in this.viewCache)) {
+                                view = [];
+                                $view = $body.find('[data-dX='+viewName+']');
+
+                                if (!$view.length) {
+                                    debug.error(
+                                        'Missing container for #'+viewName+'!',
+                                        'Create one with data-dX='+viewName+' in your index.html');
+                                    return;
+                                }
+
+                                $view.each(function(index) {
+                                    var $this = $(this);
+                                    $this.attr('data-dX', viewName+'-'+index);
+
+                                    view.push(new (that.viewList[viewName].extend({
+                                        dXRouter: that,
+                                        dXIndex: index
+                                    }))());
+                                });
+                                that.viewCache[viewName] = view;
+
+                            } else {
+                                view = this.viewCache[viewName];
+                                _.each(view, function(item) {
+                                    if ('dXEnter' in item) {
+                                        item.dXEnter();
+                                    }
+                                });
+                            }
+
+                            // emit navigation event with previous and entering view
+                            pipe.emit('navigation', this.path, this.currentView, view);
+                            pipe.emit('navigation/'+this.path, this.currentView, view);
+
+                            // Reference current router-enabled view
+                            this.currentView = view;
+
+                            /*
+                             * Create a list of route classes for the current view, will
+                             * be assigned to the body for any route specific css code.
+                             */
+
+                            this.routeClasses = this.currentRoute.replace(':', '').split('/');
+                            for (i=0, l=this.routeClasses.length, prev='dXRoute'; i<l; i++) {
+                                prev += '-'+this.routeClasses[i];
+                                this.routeClasses[i] = prev;
+                            }
+                            removeClasses($body[0], 'dXRoute-');
+                            $body.addClass(this.routeClasses.join(' '));
+                            this.postNavigation(function() {
+                                $body.addClass('dX-loadingFinished');
+                            });
+
+                        }.bind(this));
                     }.bind(this));
 
                 }.bind(this))(viewName);
@@ -315,6 +323,24 @@ define([
              */
 
             pipe.on('dXRouter/goTo', this.goTo.bind(this));
+        },
+
+        /**
+         *
+         * @param fn
+         */
+
+        preNavigation: function(fn) {
+            setTimeout(fn, 0);
+        },
+
+        /**
+         *
+         * @param fn
+         */
+
+        postNavigation: function(fn) {
+            setTimeout(fn, 0);
         },
 
         /**
