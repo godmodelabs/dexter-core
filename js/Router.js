@@ -328,6 +328,7 @@ define([
              */
 
             pipe.on('dXRouter/goTo', this.goTo.bind(this));
+            pipe.on('dXRouter/get', function(cb) { cb(this); }.bind(this));
         },
 
         /**
