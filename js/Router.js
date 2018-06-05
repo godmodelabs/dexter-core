@@ -111,7 +111,7 @@ define([
                 if (!this.viewRoutes.hasOwnProperty(viewName)) { continue; }
                 for (var i=0, l=this.viewRoutes[viewName].length, exp; i < l; i++) {
                     if (this.viewRoutes[viewName][i] === '*path') { continue; }
-                    exp = new RegExp('^' + this.viewRoutes[viewName][i].replace(/:\w+/g, '[\\w\\s]+') + '$');
+                    exp = new RegExp('^' + this.viewRoutes[viewName][i].replace(/:\w+/g, '[\\w\\s-]+') + '$');
                     if (exp.exec(this.path)) {
                         this.currentRoute = this.viewRoutes[viewName][i];
                         return this.currentRoute;
